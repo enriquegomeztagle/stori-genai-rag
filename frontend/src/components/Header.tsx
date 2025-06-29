@@ -15,8 +15,8 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-3">
             <img 
-              src="/logo.png" 
-              alt="Stori GenAI RAG Logo" 
+              src="/icon.png" 
+              alt="Stori GenAI RAG Icon" 
               className="h-8 w-8 object-contain"
             />
             <div>
