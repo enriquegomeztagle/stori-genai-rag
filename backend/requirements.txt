@@ -1,0 +1,34 @@
+# FastAPI & Pydantic
+fastapi
+uvicorn[standard]
+python-multipart
+python-dotenv
+pydantic
+pydantic-settings
+
+# LangChain and LangGraph
+langchain
+langchain-core
+langchain-community
+langchain-aws
+langchain-chroma
+
+# Vector Database
+chromadb
+
+# AWS
+boto3
+botocore
+
+# Memory and Caching
+redis
+aioredis
+
+# Document Processing
+pypdf
+python-docx
+openpyxl
+
+# Monitoring and Logging
+structlog
+loguru
