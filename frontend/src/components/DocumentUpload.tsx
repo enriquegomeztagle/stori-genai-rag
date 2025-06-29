@@ -103,24 +103,24 @@ const DocumentUpload: React.FC = () => {
         </div>
 
         {stats && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="font-semibold text-blue-900 mb-2">Knowledge Base Stats</h3>
+          <div className="mb-6 p-4 bg-[#2a9d8f]/10 rounded-lg border border-[#2a9d8f]/20">
+            <h3 className="font-semibold text-[#2a9d8f] mb-2">Knowledge Base Stats</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="text-blue-600 font-medium">Total Documents:</span>
-                <span className="ml-2 text-blue-900">{stats.total_documents}</span>
+                <span className="text-[#2a9d8f] font-medium">Total Documents:</span>
+                <span className="ml-2 text-gray-900">{stats.total_documents}</span>
               </div>
               <div>
-                <span className="text-blue-600 font-medium">Total Chunks:</span>
-                <span className="ml-2 text-blue-900">{stats.total_chunks}</span>
+                <span className="text-[#2a9d8f] font-medium">Total Chunks:</span>
+                <span className="ml-2 text-gray-900">{stats.total_chunks}</span>
               </div>
               <div>
-                <span className="text-blue-600 font-medium">Collection:</span>
-                <span className="ml-2 text-blue-900">{stats.collection_name}</span>
+                <span className="text-[#2a9d8f] font-medium">Collection:</span>
+                <span className="ml-2 text-gray-900">{stats.collection_name}</span>
               </div>
               <div>
-                <span className="text-blue-600 font-medium">Embedding Model:</span>
-                <span className="ml-2 text-blue-900">{stats.embedding_model}</span>
+                <span className="text-[#2a9d8f] font-medium">Embedding Model:</span>
+                <span className="ml-2 text-gray-900">{stats.embedding_model}</span>
               </div>
             </div>
             <button
