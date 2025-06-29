@@ -95,7 +95,7 @@ const ChatInterface: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+        <div className="bg-gradient-to-r from-[#2a9d8f] to-[#1a7d6f] px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Bot className="h-8 w-8 text-white" />
@@ -103,7 +103,7 @@ const ChatInterface: React.FC = () => {
                 <h1 className="text-xl font-bold text-white">
                   Stori GenAI RAG Assistant
                 </h1>
-                <p className="text-blue-100 text-sm">
+                <p className="text-green-100 text-sm">
                   Ask me about the Mexican Revolution
                 </p>
               </div>
@@ -137,7 +137,7 @@ const ChatInterface: React.FC = () => {
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     message.role === 'user'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[#2a9d8f] text-white'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
@@ -161,7 +161,7 @@ const ChatInterface: React.FC = () => {
                       </ReactMarkdown>
                     </div>
                     {message.role === 'user' && (
-                      <User className="h-4 w-4 mt-1 text-blue-200 flex-shrink-0" />
+                      <User className="h-4 w-4 mt-1 text-green-200 flex-shrink-0" />
                     )}
                   </div>
                 </div>
@@ -200,7 +200,7 @@ const ChatInterface: React.FC = () => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me about the Mexican Revolution..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2a9d8f] focus:border-transparent resize-none"
                 rows={2}
                 disabled={isLoading}
               />
@@ -208,7 +208,7 @@ const ChatInterface: React.FC = () => {
             <button
               onClick={handleSendMessage}
               disabled={isLoading || !inputMessage.trim()}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+              className="px-6 py-2 bg-[#2a9d8f] text-white rounded-lg hover:bg-[#1a7d6f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               <Send className="h-4 w-4" />
               <span>Send</span>
