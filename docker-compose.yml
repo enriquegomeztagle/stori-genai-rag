@@ -1,0 +1,76 @@
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL}
+      - REDIS_URL=${REDIS_URL}
+      - REDIS_DB=${REDIS_DB}
+      - CHROMA_PERSIST_DIRECTORY=${CHROMA_PERSIST_DIRECTORY}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+    volumes:
+      - ./backend/chroma_db:/app/chroma_db
+      - ./backend/logs:/app/logs
+    depends_on:
+      - redis
+    networks:
+      - stori-network
+    restart: unless-stopped
+
+  # Frontend React App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - stori-network
+    restart: unless-stopped
+
+  # Redis for memory/conversation storage
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - stori-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # ChromaDB for vector storage
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - stori-network
+    restart: unless-stopped
+    environment:
+      - CHROMA_SERVER_HOST=0.0.0.0
+      - CHROMA_SERVER_HTTP_PORT=8000
+
+volumes:
+  redis_data:
+  chroma_data:
+
+networks:
+  stori-network:
+    driver: bridge
