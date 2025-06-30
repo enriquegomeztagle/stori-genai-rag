@@ -83,6 +83,7 @@ graph TD
 ```bash
 # 1. Clone
 git clone https://github.com/enriquegomeztagle/stori-genai-rag.git
+cd stori-genai-rag
 
 # 2. Configure
 cp env.example .env               # Edit AWS credentials & Bedrock model id
