@@ -133,7 +133,7 @@ class MetricsService:
                     metrics.user_rating = rating
 
                     await self._update_conversation_metrics(
-                        metrics.conversation_id, metrics
+                        metrics.conversation_id, metrics, is_new_response=False
                     )
 
                     logger.info(
@@ -144,7 +144,10 @@ class MetricsService:
             return False
 
     async def _update_conversation_metrics(
-        self, conversation_id: str, response_metrics: ResponseMetrics
+        self,
+        conversation_id: str,
+        response_metrics: ResponseMetrics,
+        is_new_response: bool = True,
     ):
         if conversation_id not in self.conversation_metrics:
             self.conversation_metrics[conversation_id] = ConversationMetrics(
@@ -161,19 +164,22 @@ class MetricsService:
             )
 
         conv_metrics = self.conversation_metrics[conversation_id]
-        conv_metrics.total_messages += 1
-        conv_metrics.last_activity = datetime.utcnow()
 
-        for tool in response_metrics.tools_used:
-            conv_metrics.tools_usage_count[tool] += 1
+        if is_new_response:
+            conv_metrics.total_messages += 1
+
+            if conv_metrics.total_messages > 1:
+                conv_metrics.follow_up_questions += 1
+
+            for tool in response_metrics.tools_used:
+                conv_metrics.tools_usage_count[tool] += 1
+
+        conv_metrics.last_activity = datetime.utcnow()
 
         if response_metrics.user_rating == "like":
             conv_metrics.total_likes += 1
         elif response_metrics.user_rating == "dislike":
             conv_metrics.total_dislikes += 1
-
-        if conv_metrics.total_messages > 1:
-            conv_metrics.follow_up_questions += 1
 
         conversation_responses = [
             rm for rm in self.response_metrics if rm.conversation_id == conversation_id
@@ -188,7 +194,9 @@ class MetricsService:
         response_lower = response.lower()
 
         for test_id, test_data in self.test_queries.items():
-            if any(keyword in query_lower for keyword in test_data["keywords"]):
+            if test_data["query"].lower() in query_lower or any(
+                keyword in query_lower for keyword in test_data["keywords"]
+            ):
                 expected_answer = test_data["expected_answer"].lower()
 
                 if expected_answer in response_lower:
@@ -317,11 +325,25 @@ class MetricsService:
     async def export_metrics(self) -> Dict[str, Any]:
         system_metrics = await self.get_system_metrics()
 
+        conversation_metrics_list = []
+        for cm in self.conversation_metrics.values():
+            cm_dict = {
+                "conversation_id": cm.conversation_id,
+                "total_messages": cm.total_messages,
+                "follow_up_questions": cm.follow_up_questions,
+                "context_retention_score": cm.context_retention_score,
+                "average_response_time": cm.average_response_time,
+                "total_likes": cm.total_likes,
+                "total_dislikes": cm.total_dislikes,
+                "tools_usage_count": dict(cm.tools_usage_count),
+                "created_at": cm.created_at,
+                "last_activity": cm.last_activity,
+            }
+            conversation_metrics_list.append(cm_dict)
+
         return {
             "system_metrics": asdict(system_metrics),
-            "conversation_metrics": [
-                asdict(cm) for cm in self.conversation_metrics.values()
-            ],
+            "conversation_metrics": conversation_metrics_list,
             "response_metrics": [asdict(rm) for rm in self.response_metrics],
             "export_timestamp": datetime.utcnow().isoformat(),
         }
