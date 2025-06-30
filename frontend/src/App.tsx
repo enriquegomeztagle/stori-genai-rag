@@ -3,6 +3,7 @@ import ChatInterface from './components/ChatInterface';
 import DocumentUpload from './components/DocumentUpload';
 import Header from './components/Header';
 import HealthCheck from './components/HealthCheck';
+import MetricsDashboard from './components/MetricsDashboard';
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
             <Route path="/" element={<ChatInterface />} />
             <Route path="/upload" element={<DocumentUpload />} />
             <Route path="/health" element={<HealthCheck />} />
+            <Route path="/metrics" element={<MetricsDashboard />} />
           </Routes>
         </main>
       </div>
