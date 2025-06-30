@@ -13,12 +13,14 @@ from ..core.logging import logger
 
 class VectorStoreService:
     def __init__(self):
-        self.chroma_client = chromadb.Client(
+        self.chroma_client = chromadb.PersistentClient(
+            path=settings.chroma_persist_directory,
             settings=ChromaSettings(
                 anonymized_telemetry=False,
                 allow_reset=True,
-                is_persistent=False,
-            )
+                is_persistent=True,
+                persist_directory=settings.chroma_persist_directory,
+            ),
         )
 
         try:
@@ -34,7 +36,7 @@ class VectorStoreService:
             chunk_size=settings.chunk_size,
             chunk_overlap=settings.chunk_overlap,
             length_function=len,
-            separators=["\n\n", "\n", " ", ""],
+            separators=["\n\n", "\n", " "],
         )
 
         self.vector_store = Chroma(
@@ -88,11 +90,10 @@ class VectorStoreService:
 
     def get_collection_stats(self) -> Dict[str, Any]:
         try:
-            collection = self.chroma_client.get_collection("mexican_revolution_docs")
-            count_chunks = collection.count()
+            all_data = self.vector_store.get(include=["metadatas"])
+            all_metadatas = all_data.get("metadatas", [])
 
-            all_data = collection.get(include=["metadatas"])
-            all_metadatas = all_data["metadatas"]
+            count_chunks = len(all_metadatas)
 
             unique_documents = set()
             for meta in all_metadatas:
@@ -105,7 +106,7 @@ class VectorStoreService:
 
             return {
                 "total_chunks": count_chunks,
-                "total_chunks_real": len(all_metadatas),
+                "total_chunks_real": count_chunks,
                 "total_documents": count_documents,
                 "collection_name": "mexican_revolution_docs",
                 "embedding_model": settings.embedding_model,
@@ -123,7 +124,7 @@ class VectorStoreService:
 
     def delete_documents(self, ids: List[str]) -> bool:
         try:
-            self.vector_store.delete(ids)
+            self.vector_store.delete(ids=ids)
             return True
 
         except Exception as e:
@@ -131,7 +132,7 @@ class VectorStoreService:
 
     def clear_collection(self) -> bool:
         try:
-            self.chroma_client.delete_collection("mexican_revolution_docs")
+            self.vector_store.delete_collection()
             self.vector_store = Chroma(
                 client=self.chroma_client,
                 collection_name="mexican_revolution_docs",
@@ -141,3 +142,13 @@ class VectorStoreService:
 
         except Exception as e:
             raise Exception(f"Error clearing collection: {str(e)}")
+
+    def get_document_by_id(self, document_id: str) -> Optional[Dict[str, Any]]:
+        result = self.vector_store.get(ids=[document_id])
+        documents = result.get("documents", [])
+        metadatas = result.get("metadatas", [])
+
+        if not documents:
+            return None
+
+        return {"document": documents[0], "metadata": metadatas[0]}

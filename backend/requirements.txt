@@ -22,12 +22,12 @@ botocore
 
 # Memory and Caching
 redis
-aioredis
 
 # Document Processing
 pypdf
 python-docx
 openpyxl
+docx2txt
 
 # Monitoring and Logging
 structlog
