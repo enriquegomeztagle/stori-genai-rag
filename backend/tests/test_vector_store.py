@@ -13,7 +13,7 @@ class TestVectorStoreService:
         ) as mock_embeddings, patch(
             "app.services.vector_store.Chroma"
         ) as mock_chroma, patch(
-            "chromadb.Client"
+            "chromadb.PersistentClient"
         ) as mock_client:
 
             mock_embeddings.return_value = Mock()
@@ -38,7 +38,7 @@ class TestVectorStoreService:
         ]
 
     @patch("app.services.vector_store.BedrockEmbeddings")
-    @patch("chromadb.Client")
+    @patch("chromadb.PersistentClient")
     def test_initialization(self, mock_chroma_client, mock_embeddings):
         with patch("app.services.vector_store.Chroma") as mock_chroma:
             service = VectorStoreService()
