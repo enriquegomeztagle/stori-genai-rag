@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Settings } from 'lucide-react';
-import { sendMessage } from '../services/api';
+import { Send, Bot, User, Loader2, Settings, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { sendMessage, recordUserRating } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  response_id?: string;
+  user_rating?: 'like' | 'dislike';
 }
 
 interface ChatResponse {
@@ -15,6 +17,7 @@ interface ChatResponse {
   sources: any[];
   tools_used: string[];
   confidence_score: number;
+  response_id?: string;
 }
 
 const ChatInterface: React.FC = () => {
@@ -56,7 +59,8 @@ const ChatInterface: React.FC = () => {
       const assistantMessage: Message = {
         role: 'assistant',
         content: response.response,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        response_id: response.response_id
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -77,6 +81,27 @@ const ChatInterface: React.FC = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRating = async (messageIndex: number, rating: 'like' | 'dislike') => {
+    const message = messages[messageIndex];
+    if (!message.response_id || message.user_rating) return;
+
+    try {
+      await recordUserRating({
+        response_id: message.response_id,
+        rating: rating
+      });
+
+      setMessages(prev => prev.map((msg, index) => 
+        index === messageIndex 
+          ? { ...msg, user_rating: rating }
+          : msg
+      ));
+
+    } catch (error) {
+      console.error('Error recording rating:', error);
     }
   };
 
@@ -164,6 +189,42 @@ const ChatInterface: React.FC = () => {
                       <User className="h-4 w-4 mt-1 text-green-200 flex-shrink-0" />
                     )}
                   </div>
+                  
+                  {message.role === 'assistant' && message.response_id && (
+                    <div className="flex items-center justify-end space-x-2 mt-3 pt-2 border-t border-gray-200">
+                      {message.user_rating ? (
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          message.user_rating === 'like' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {message.user_rating === 'like' ? (
+                            <ThumbsUp className="h-3 w-3 mr-1" />
+                          ) : (
+                            <ThumbsDown className="h-3 w-3 mr-1" />
+                          )}
+                          {message.user_rating === 'like' ? 'Liked' : 'Disliked'}
+                        </span>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleRating(index, 'like')}
+                            className="flex items-center px-2 py-1 text-xs text-gray-600 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                          >
+                            <ThumbsUp className="h-3 w-3 mr-1" />
+                            Like
+                          </button>
+                          <button
+                            onClick={() => handleRating(index, 'dislike')}
+                            className="flex items-center px-2 py-1 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <ThumbsDown className="h-3 w-3 mr-1" />
+                            Dislike
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))
@@ -208,10 +269,13 @@ const ChatInterface: React.FC = () => {
             <button
               onClick={handleSendMessage}
               disabled={isLoading || !inputMessage.trim()}
-              className="px-6 py-2 bg-[#2a9d8f] text-white rounded-lg hover:bg-[#1a7d6f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+              className="px-6 py-2 bg-[#2a9d8f] text-white rounded-lg hover:bg-[#1a7d6f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
             >
-              <Send className="h-4 w-4" />
-              <span>Send</span>
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>
