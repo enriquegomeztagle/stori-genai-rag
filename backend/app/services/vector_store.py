@@ -13,12 +13,14 @@ from ..core.logging import logger
 
 class VectorStoreService:
     def __init__(self):
-        self.chroma_client = chromadb.Client(
+        self.chroma_client = chromadb.PersistentClient(
+            path=settings.chroma_persist_directory,
             settings=ChromaSettings(
                 anonymized_telemetry=False,
                 allow_reset=True,
                 is_persistent=True,
-            )
+                persist_directory=settings.chroma_persist_directory,
+            ),
         )
 
         try:
