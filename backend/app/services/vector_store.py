@@ -17,7 +17,7 @@ class VectorStoreService:
             settings=ChromaSettings(
                 anonymized_telemetry=False,
                 allow_reset=True,
-                is_persistent=False,
+                is_persistent=True,
             )
         )
 
@@ -34,7 +34,7 @@ class VectorStoreService:
             chunk_size=settings.chunk_size,
             chunk_overlap=settings.chunk_overlap,
             length_function=len,
-            separators=["\n\n", "\n", " ", ""],
+            separators=["\n\n", "\n", " "],
         )
 
         self.vector_store = Chroma(
