@@ -68,6 +68,7 @@ tmp/
 
 # ChromaDB
 chroma_db/
+chroma/
 
 # Frontend
 # Dependencies
