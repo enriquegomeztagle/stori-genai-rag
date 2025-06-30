@@ -53,9 +53,9 @@ We’re interested in reviewing your process for refining and tuning your RAG
 
 In 1–2 short paragraphs:
 
-- [ ] Briefly describe your system architecture. Please include an architectural diagram to help
-- [ ] What design tradeoffs or assumptions did you make?
-- [ ] What would you improve if given more time?
+- [X] Briefly describe your system architecture. Please include an architectural diagram to help
+- [X] What design tradeoffs or assumptions did you make?
+- [X] What would you improve if given more time?
 
 ## What We’re Looking For
 
