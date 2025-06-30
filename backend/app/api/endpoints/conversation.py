@@ -1,5 +1,6 @@
 import datetime
 import uuid
+import time
 
 from fastapi import APIRouter, HTTPException, Depends
 from ...models.schemas import (
@@ -12,6 +13,7 @@ from ...models.schemas import (
 from ...services.rag_service import RAGService
 from ...services.memory_service import MemoryService
 from ...services.bedrock_service import BedrockService
+from ...services.metrics_service import MetricsService
 from ...core.logging import logger
 
 router = APIRouter()
@@ -35,10 +37,21 @@ def get_bedrock_service() -> BedrockService:
     return bedrock_service
 
 
+def get_metrics_service() -> MetricsService:
+    from ...main import metrics_service
+
+    return metrics_service
+
+
 @router.post("/chat", response_model=ConversationResponse)
 async def chat(
-    request: ConversationRequest, rag_service: RAGService = Depends(get_rag_service)
+    request: ConversationRequest,
+    rag_service: RAGService = Depends(get_rag_service),
+    metrics_service: MetricsService = Depends(get_metrics_service),
 ):
+    start_time = time.time()
+    response_id = None
+
     try:
         logger.info(
             "Processing chat message",
@@ -52,6 +65,8 @@ async def chat(
             use_tools=request.use_tools,
         )
 
+        response_time = time.time() - start_time
+
         response = ConversationResponse(
             response=result["response"],
             conversation_id=result["conversation_id"],
@@ -60,15 +75,48 @@ async def chat(
             confidence_score=result.get("confidence_score", 0.0),
         )
 
+        response_id = await metrics_service.record_response(
+            conversation_id=result["conversation_id"],
+            query=request.message,
+            response=result["response"],
+            response_time=response_time,
+            confidence_score=result.get("confidence_score", 0.0),
+            tools_used=result.get("tools_used", []),
+            sources_count=len(result.get("sources", [])),
+            error_occurred=False,
+        )
+
+        response.response_id = response_id
+
         logger.info(
             "Chat response generated",
             conversation_id=response.conversation_id,
             tools_used=response.tools_used,
+            response_time=response_time,
+            response_id=response_id,
         )
 
         return response
 
     except Exception as e:
+        response_time = time.time() - start_time
+
+        if request.conversation_id and metrics_service:
+            try:
+                await metrics_service.record_response(
+                    conversation_id=request.conversation_id,
+                    query=request.message,
+                    response="",
+                    response_time=response_time,
+                    confidence_score=0.0,
+                    tools_used=[],
+                    sources_count=0,
+                    error_occurred=True,
+                    error_message=str(e),
+                )
+            except Exception as metrics_error:
+                logger.error("Error recording metrics", error=str(metrics_error))
+
         logger.error("Error processing chat message", error=str(e))
         raise HTTPException(status_code=500, detail=str(e)) from e
 
