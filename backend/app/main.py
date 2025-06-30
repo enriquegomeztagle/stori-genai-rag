@@ -14,6 +14,7 @@ from app.services.vector_store import VectorStoreService
 from app.services.memory_service import MemoryService
 from app.services.document_service import DocumentService
 from app.services.rag_service import RAGService
+from app.services.metrics_service import MetricsService
 from app.tools.agent_tools import get_agent_tools
 
 sys.path.append("/app")
@@ -23,11 +24,12 @@ vector_store_service = None
 memory_service = None
 document_service = None
 rag_service = None
+metrics_service = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global bedrock_service, vector_store_service, memory_service, document_service, rag_service
+    global bedrock_service, vector_store_service, memory_service, document_service, rag_service, metrics_service
 
     logger.info("Starting up Stori GenAI RAG application")
 
@@ -36,6 +38,7 @@ async def lifespan(app: FastAPI):
         vector_store_service = VectorStoreService()
         memory_service = MemoryService()
         document_service = DocumentService()
+        metrics_service = MetricsService()
 
         tools = get_agent_tools(memory_service, bedrock_service, vector_store_service)
 
@@ -153,6 +156,10 @@ def get_document_service() -> DocumentService:
 
 def get_rag_service() -> RAGService:
     return rag_service
+
+
+def get_metrics_service() -> MetricsService:
+    return metrics_service
 
 
 if __name__ == "__main__":
