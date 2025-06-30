@@ -122,4 +122,51 @@ export const getBedrockHealth = async () => {
   return response.data;
 };
 
+export const recordUserRating = async (data: {
+  response_id: string;
+  rating: 'like' | 'dislike';
+}) => {
+  const response = await api.post('/metrics/rating', data);
+  return response.data;
+};
+
+export const getSystemMetrics = async () => {
+  const response = await api.get('/metrics/system');
+  return response.data;
+};
+
+export const getConversationMetrics = async (conversationId: string) => {
+  const response = await api.get(`/metrics/conversation/${conversationId}`);
+  return response.data;
+};
+
+export const getAllConversationMetrics = async () => {
+  const response = await api.get('/metrics/conversations');
+  return response.data;
+};
+
+export const getResponseMetrics = async (responseId: string) => {
+  const response = await api.get(`/metrics/response/${responseId}`);
+  return response.data;
+};
+
+export const getRecentMetrics = async (hours: number = 24) => {
+  const response = await api.get('/metrics/recent', {
+    params: { hours }
+  });
+  return response.data;
+};
+
+export const exportMetrics = async () => {
+  const response = await api.post('/metrics/export');
+  return response.data;
+};
+
+export const clearOldMetrics = async (days: number = 30) => {
+  const response = await api.delete('/metrics/clear', {
+    params: { days }
+  });
+  return response.data;
+};
+
 export default api; 
