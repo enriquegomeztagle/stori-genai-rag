@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     embedding_model: str = os.getenv("EMBEDDING_MODEL")
 
     redis_url: str = os.getenv("REDIS_URL", "redis://redis:6379")
-    redis_db: str = os.getenv("REDIS_DB", "0")
+    redis_db: int = int(os.getenv("REDIS_DB", "0"))
 
     s3_bucket_name: Optional[str] = os.getenv("S3_BUCKET_NAME")
     s3_region: str = os.getenv("AWS_REGION", "us-west-2")
