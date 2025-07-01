@@ -6,8 +6,12 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     gcc \
     g++ \
     curl \
+    locales \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN sed -i '/es_ES.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -19,6 +23,10 @@ RUN mkdir -p /app/chroma_db /app/logs /chroma/chroma_db
 
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
+
+ENV LANG=es_ES.UTF-8
+ENV LC_ALL=es_ES.UTF-8
+ENV LANGUAGE=es_ES:es
 
 EXPOSE 8000
 

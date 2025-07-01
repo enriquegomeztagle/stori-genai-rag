@@ -137,7 +137,6 @@ graph TD
   class ECR,SM,S3,Bedrock services
 ```
 
-
 ---
 
 ## Tech Stack
@@ -223,7 +222,8 @@ aws secretsmanager create-secret \
 {
   "S3_BUCKET_NAME": "stori-documents",
   "EMBEDDING_MODEL": "amazon.titan-embed-text-v1",
-  "BEDROCK_MODEL_ID": "anthropic.claude-3-5-haiku-20241022-v1:0"
+  "BEDROCK_MODEL_ID": "anthropic.claude-3-5-haiku-20241022-v1:0",
+  "DEFAULT_LANGUAGE": "es"
 }
 ```
 
