@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN mkdir -p /app/chroma_db /app/logs
+RUN mkdir -p /app/chroma_db /app/logs /chroma/chroma_db
 
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
