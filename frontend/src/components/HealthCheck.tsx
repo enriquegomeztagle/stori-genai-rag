@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Activity, RefreshCw, CheckCircle, XCircle, Database, Brain, HardDrive } from 'lucide-react';
+import { API_CONFIG, buildApiUrl } from '../config/api';
 
 interface HealthStatus {
   status: string;
@@ -31,8 +32,10 @@ const HealthCheck: React.FC = () => {
 
   const checkHealth = async () => {
     setIsLoading(true);
+    const healthUrl = buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH);
+    
     try {
-      const response = await fetch('http://localhost:8000/api/v1/health/health');
+      const response = await fetch(healthUrl);
       const data = await response.json();
       
       setHealthStatus({
@@ -43,7 +46,7 @@ const HealthCheck: React.FC = () => {
       
       const newLogs = [
         `🔍 Checking backend health...`,
-        `📡 Request sent to: http://localhost:8000/api/v1/health/health`,
+        `📡 Request sent to: ${healthUrl}`,
         `📊 Response received: ${response.status} ${response.statusText}`,
         `📋 Status: ${data.status}`,
         `💬 Message: ${data.message || 'Backend is running'}`,
@@ -61,7 +64,7 @@ const HealthCheck: React.FC = () => {
       
       const errorLogs = [
         `🔍 Checking backend health...`,
-        `📡 Request sent to: http://localhost:8000/api/v1/health/health`,
+        `📡 Request sent to: ${healthUrl}`,
         `❌ Connection failed: ${error}`,
         `💀 Backend appears to be down`,
         `⏰ Timestamp: ${new Date().toLocaleTimeString()}`
@@ -77,13 +80,13 @@ const HealthCheck: React.FC = () => {
   const checkServicesHealth = async () => {
     setIsLoadingServices(true);
     try {
-      const memoryResponse = await fetch('http://localhost:8000/api/v1/health/health/memory');
+      const memoryResponse = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH_MEMORY));
       const memoryData = await memoryResponse.json();
       
-      const vectorResponse = await fetch('http://localhost:8000/api/v1/health/health/vector-store');
+      const vectorResponse = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH_VECTOR));
       const vectorData = await vectorResponse.json();
       
-      const bedrockResponse = await fetch('http://localhost:8000/api/v1/health/health/bedrock');
+      const bedrockResponse = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH_BEDROCK));
       const bedrockData = await bedrockResponse.json();
       
       setServicesHealth({
@@ -279,7 +282,7 @@ const HealthCheck: React.FC = () => {
                 <span className="font-semibold text-gray-700">Endpoint</span>
               </div>
               <p className="text-sm font-mono text-gray-600 mt-1 break-all">
-                localhost:8000/api/v1/health/health
+                {buildApiUrl(API_CONFIG.ENDPOINTS.HEALTH)}
               </p>
             </div>
           </div>
