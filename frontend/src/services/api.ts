@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/runtime-config';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL_WITH_PATH = `${API_BASE_URL}/api/v1`;
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL_WITH_PATH,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,6 +13,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     console.log('API Request:', config.method?.toUpperCase(), config.url);
+    console.log('Full URL:', `${API_BASE_URL_WITH_PATH}${config.url}`);
     return config;
   },
   (error) => {
@@ -25,6 +27,7 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('API Error:', error.response?.data || error.message);
+    console.error('Failed URL:', error.config?.url);
     return Promise.reject(error);
   }
 );
