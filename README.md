@@ -67,7 +67,6 @@ graph TD
 
 ```mermaid
 graph TD
-  %% Clústeres y subgráficos
   subgraph Internet [Internet]
     A[Users]
   end
@@ -111,7 +110,6 @@ graph TD
     end
   end
 
-  %% Conexiones
   A -->|HTTPS| ALB_FE
   A -->|HTTPS| ALB_BE
   ALB_FE -->|HTTP| FE
@@ -123,7 +121,6 @@ graph TD
   BE -->|S3 API| S3
   BE -->|Bedrock API| Bedrock
 
-  %% Estilos
   classDef internet fill:#e1f5fe,stroke:#333,stroke-width:1px;
   classDef alb fill:#fff3e0,stroke:#333,stroke-width:1px;
   classDef ecs fill:#e8f5e8,stroke:#333,stroke-width:1px;
