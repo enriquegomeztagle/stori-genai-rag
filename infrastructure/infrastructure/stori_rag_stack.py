@@ -155,6 +155,9 @@ class StoriRagStack(Stack):
                     "REDIS_URL": redis_endpoint,
                     "REDIS_DB": "0",
                     "CHROMA_PERSIST_DIRECTORY": "/chroma/chroma_db",
+                    "LANG": "es_ES.UTF-8",
+                    "LC_ALL": "es_ES.UTF-8",
+                    "LANGUAGE": "es_ES:es",
                 },
                 secrets={
                     "BEDROCK_MODEL_ID": ecs.Secret.from_secrets_manager(
@@ -165,6 +168,9 @@ class StoriRagStack(Stack):
                     ),
                     "EMBEDDING_MODEL": ecs.Secret.from_secrets_manager(
                         rag_secret, "EMBEDDING_MODEL"
+                    ),
+                    "DEFAULT_LANGUAGE": ecs.Secret.from_secrets_manager(
+                        rag_secret, "DEFAULT_LANGUAGE"
                     ),
                 },
             ),
