@@ -29,8 +29,8 @@ cp env.example .env
 | `AWS_REGION` | `us-west-2` | Region that supports the chosen Bedrock model |
 | `BEDROCK_MODEL_ID` | `anthropic.claude-3-5-haiku-20241022-v1:0` | LLM used for generation |
 | `EMBEDDING_MODEL` | `amazon.titan-embed-text-v1` | Embedding model for vector store |
-| `S3_BUCKET_NAME` | `stori-genai-rag-demo` | Optional raw‑document archive (leave blank to disable) |
-| `REDIS_URL` | `redis://redis:6379/0` | Chat‑memory store |
+| `S3_BUCKET_NAME` | `stori-documents` | Optional raw‑document archive (leave blank to disable) |
+| `REDIS_URL` | `redis://redis:6379/0` (for local development) | Chat‑memory store |
 | `CHROMA_PERSIST_DIRECTORY` | `/chroma` | Volume path for vectors |
 
 ---
@@ -103,7 +103,7 @@ Example prompts:
 ## 8. Shutdown & cleanup
 ```bash
 docker compose down            # stop containers
-docker compose down -v         # additionally remove named volumes (erases vectors & redis)
+docker compose down -v         # additionally remove named volumes
 ```
 
 ---
