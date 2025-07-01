@@ -3,6 +3,7 @@ import uuid
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import boto3
+from botocore.exceptions import ClientError
 from langchain.schema import Document
 from langchain_community.document_loaders import (
     PyPDFLoader,
@@ -11,6 +12,7 @@ from langchain_community.document_loaders import (
     TextLoader,
 )
 from ..core.config import settings
+from ..core.logging import logger
 
 
 class DocumentService:
@@ -29,6 +31,58 @@ class DocumentService:
             ".xls": "excel",
             ".txt": "text",
         }
+        self._ensure_bucket_exists()
+
+    def _ensure_bucket_exists(self):
+        try:
+            self.s3_client.head_bucket(Bucket=settings.s3_bucket_name)
+            logger.info(f"S3 bucket '{settings.s3_bucket_name}' already exists")
+        except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "404" or error_code == "NoSuchBucket":
+                try:
+                    self.s3_client.create_bucket(
+                        Bucket=settings.s3_bucket_name,
+                        CreateBucketConfiguration=(
+                            {"LocationConstraint": settings.s3_region}
+                            if settings.s3_region != "us-east-1"
+                            else {}
+                        ),
+                    )
+                    logger.info(f"Created S3 bucket '{settings.s3_bucket_name}'")
+
+                    self.s3_client.put_bucket_versioning(
+                        Bucket=settings.s3_bucket_name,
+                        VersioningConfiguration={"Status": "Enabled"},
+                    )
+
+                    self.s3_client.put_bucket_encryption(
+                        Bucket=settings.s3_bucket_name,
+                        ServerSideEncryptionConfiguration={
+                            "Rules": [
+                                {
+                                    "ApplyServerSideEncryptionByDefault": {
+                                        "SSEAlgorithm": "AES256"
+                                    }
+                                }
+                            ]
+                        },
+                    )
+
+                    logger.info(
+                        f"Configured S3 bucket '{settings.s3_bucket_name}' with versioning and encryption"
+                    )
+
+                except ClientError as create_error:
+                    logger.error(
+                        f"Failed to create S3 bucket '{settings.s3_bucket_name}': {create_error}"
+                    )
+                    raise Exception(f"Failed to create S3 bucket: {create_error}")
+            else:
+                logger.error(
+                    f"Error checking S3 bucket '{settings.s3_bucket_name}': {e}"
+                )
+                raise Exception(f"Error accessing S3 bucket: {e}")
 
     def get_file_extension(self, filename: str) -> str:
         return os.path.splitext(filename.lower())[1]
