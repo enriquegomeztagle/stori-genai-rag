@@ -38,12 +38,10 @@ Stori's GenAI team asked for a **conversational assistant** that can reason over
 
 - **💬 Conversational RAG** – context‑aware answers in Spanish or English.
 - **🧠 Tooling Agents** – summarisation, intent classification, human escalation & content‑safety guardrails.
-- **📄 One‑click Document Upload** – drag‑and‑drop UI, automatic S3 backup.
+- **📄 One‑click Document Upload** – drag‑and‑drop UI, automatic S3 backup (optional).
 - **📈 Metrics Dashboard** – live KPIs with like‑ratio, error‑rate & retention.
 - **🏥 Health Check** – deep probes for Redis, Chroma and Bedrock.
 - **⚙️ Zero‑Config Local Run** – `./start.sh` builds & starts everything.
-
-<!-- - **☁️ Cloud Ready** – sample AWS CDK stack (VPC, ECS, ALB, ElastiCache). # TODO -->
 
 ---
 

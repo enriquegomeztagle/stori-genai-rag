@@ -47,7 +47,7 @@ We’re interested in reviewing your process for refining and tuning your RAG
 3) **Infrastructure Perspective**
 
 - [X] Submit a Dockerfile that runs your app locally.
-- [ ] **_Bonus: If you can, show us how you’d deploy it to the cloud (CDK preferred)_**
+- [X] **_Bonus: If you can, show us how you’d deploy it to the cloud (CDK preferred)_**
 
 4) **System Design Overview**
 
